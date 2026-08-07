@@ -100,16 +100,16 @@
   <p class="sub">Smithton (Conference Venue) & Stanley (20 min coastal drive)</p>
 
   <div class="filter-group" id="hotelFilters">
-    <button class="filter-btn active" onclick="filterHotels('All', event)">All Locations</button>
-    <button class="filter-btn" onclick="filterHotels('Smithton', event)">Smithton</button>
-    <button class="filter-btn" onclick="filterHotels('Stanley', event)">Stanley</button>
+    <button class="filter-btn active" onclick="filterHotels('All', this)">All Locations</button>
+    <button class="filter-btn" onclick="filterHotels('Smithton', this)">Smithton</button>
+    <button class="filter-btn" onclick="filterHotels('Stanley', this)">Stanley</button>
   </div>
 
   <div class="grid" id="hotelResults"></div>
 </div>
 
 <script>
-const hotelsData =[cite: 2]
+const hotelsData = [
   {"name": "Tall Timbers Tasmania", "location": "Smithton", "rate": "$190", "total": "Special BOM Rate", "rating": 4.3, "link": "http://www.talltimbershotel.com.au/"},
   {"name": "The Bridge Hotel", "location": "Smithton", "rate": "$92", "total": "$368", "rating": 4.2, "link": "http://www.bridgebistro.goodstone.com.au/"},
   {"name": "Stanley Seaview Inn", "location": "Stanley", "rate": "$211", "total": "$844", "rating": 4.4, "link": "http://stanleyseaviewinn.com.au/"},
@@ -120,10 +120,10 @@ const hotelsData =[cite: 2]
   {"name": "Bilbos Cottage at Little Bird", "location": "Smithton", "rate": "$174", "total": "$696", "rating": 4.7, "link": "https://www.booking.com/hotel/au/bilbos-cottage-at-little-bird.en-gb.html"}
 ];
 
-function filterHotels(loc, evt) {
-  if (evt) {
+function filterHotels(loc, btnElement) {
+  if (btnElement) {
     document.querySelectorAll('#hotelFilters .filter-btn').forEach(b => b.classList.remove('active'));
-    evt.target.classList.add('active');
+    btnElement.classList.add('active');
   }
 
   const container = document.getElementById('hotelResults');
