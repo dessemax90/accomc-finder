@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACCOMC 2026 - Flight Options</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #2563eb;
+      --bg: #ffffff;
+      --card-bg: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent-green: #16a34a;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 10px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+    h2 { color: var(--primary); margin: 0 0 4px 0; font-size: 20px; }
+    p.sub { color: var(--text-muted); font-size: 13px; margin: 0 0 16px 0; }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 12px;
+    }
+
+    .airport-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .airport-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .flight-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .airline-logo { height: 20px; max-width: 70px; object-fit: contain; }
+    .flight-details { flex-grow: 1; margin-left: 10px; }
+    .flight-num { font-weight: bold; font-size: 13px; }
+    .flight-route { font-size: 11px; color: #0369a1; font-weight: 600; }
+    .flight-time { font-size: 11px; color: var(--text-muted); }
+    .flight-price { font-weight: bold; color: var(--accent-green); font-size: 14px; }
+    .no-flights { font-size: 12px; color: var(--text-muted); font-style: italic; }
+    .note-box { background: #eff6ff; border-left: 4px solid var(--primary-light); padding: 8px 12px; font-size: 12px; color: #1e40af; margin-bottom: 16px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>✈️ Direct & Connecting Flights to Tasmania</h2>
+  <p class="sub">Indicative schedules & fares for Conference travel (16 November 2026)</p>
+
+  <div class="note-box">
+    💡 <strong>Note on Return Flights:</strong> Displayed flights reflect outbound arrival schedules. Most carriers operate symmetrical return flights on Friday, 20 November. Check Skyscanner or carrier sites for live return fares.
+  </div>
+
+  <div class="filter-group" id="cityFilters">
+    <button class="filter-btn active" onclick="filterCity('MEL', event)">Melbourne (MEL / AVV)</button>
+    <button class="filter-btn" onclick="filterCity('SYD', event)">Sydney (SYD / WSI)</button>
+    <button class="filter-btn" onclick="filterCity('ADL', event)">Adelaide (ADL)</button>
+    <button class="filter-btn" onclick="filterCity('CBR', event)">Canberra (CBR)</button>
+    <button class="filter-btn" onclick="filterCity('BNE', event)">Brisbane (BNE)</button>
+  </div>
+
+  <div class="grid" id="flightResults"></div>
+</div>
+
+<script>
+const airlineLogos = {
+  "Qantas": "https://logos-world.net/wp-content/uploads/2023/01/Qantas-Logo.png",
+  "Virgin Australia": "https://upload.wikimedia.org/wikipedia/en/thumb/0/06/Virgin_Australia_Logo_2022.svg/3840px-Virgin_Australia_Logo_2022.svg.png",
+  "Jetstar": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Jetstar_logo.svg/3840px-Jetstar_logo.svg.png"
+};
+
+// Mapping cities to airport codes
+const cityAirports = {
+  "MEL": ["MEL", "AVV", "MEB"],
+  "SYD": ["SYD", "WSI"],
+  "ADL": ["ADL"],
+  "CBR": ["CBR"],
+  "BNE": ["BNE"]
+};
+
+const flightsData =[cite: 1]{
+  "MEL -> BWT": [{"airline": "Qantas", "flight_number": "QF 2085", "departure": "07:15", "arrival": "08:25", "price_aud": 436}],
+  "MEL -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 1380", "departure": "21:20", "arrival": "22:30", "price_aud": 183},
+    {"airline": "Jetstar", "flight_number": "JQ 733", "departure": "07:10", "arrival": "08:20", "price_aud": 199},
+    {"airline": "Virgin Australia", "flight_number": "VA 1362", "departure": "09:40", "arrival": "10:50", "price_aud": 211}
+  ],
+  "SYD -> BWT": [
+    {"airline": "Qantas", "flight_number": "QF 441", "departure": "12:00", "arrival": "13:35", "price_aud": 797},
+    {"airline": "Qantas", "flight_number": "QF 1511", "departure": "13:00", "arrival": "14:35", "price_aud": 826},
+    {"airline": "Qantas", "flight_number": "QF 449", "departure": "14:00", "arrival": "15:35", "price_aud": 830}
+  ],
+  "SYD -> DPO": [
+    {"airline": "Qantas", "flight_number": "QF 401", "departure": "06:00", "arrival": "07:35", "price_aud": 648},
+    {"airline": "Qantas", "flight_number": "QF 461", "departure": "16:15", "arrival": "17:50", "price_aud": 648}
+  ],
+  "SYD -> LST": [
+    {"airline": "Jetstar", "flight_number": "JQ 749", "departure": "18:05", "arrival": "19:50", "price_aud": 181},
+    {"airline": "Virgin Australia", "flight_number": "VA 1094", "departure": "13:20", "arrival": "15:05", "price_aud": 225},
+    {"airline": "Qantas", "flight_number": "QF 1549", "departure": "13:15", "arrival": "15:05", "price_aud": 296}
+  ],
+  "ADL -> BWT": [
+    {"airline": "Qantas", "flight_number": "QF 674", "departure": "07:50", "arrival": "09:35", "price_aud": 806},
+    {"airline": "Qantas", "flight_number": "QF 686", "departure": "14:15", "arrival": "16:00", "price_aud": 806}
+  ],
+  "ADL -> DPO": [
+    {"airline": "Qantas", "flight_number": "QF 686", "departure": "14:15", "arrival": "16:00", "price_aud": 801},
+    {"airline": "Qantas", "flight_number": "QF 682", "departure": "12:00", "arrival": "13:45", "price_aud": 850}
+  ],
+  "ADL -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 236", "departure": "17:50", "arrival": "19:40", "price_aud": 358},
+    {"airline": "Virgin Australia", "flight_number": "VA 208", "departure": "07:15", "arrival": "09:05", "price_aud": 405},
+    {"airline": "Jetstar", "flight_number": "JQ 771", "departure": "06:15", "arrival": "08:05", "price_aud": 444}
+  ],
+  "CBR -> DPO": [{"airline": "Qantas", "flight_number": "QF 1551", "departure": "06:00", "arrival": "07:15", "price_aud": 666}],
+  "CBR -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 252", "departure": "06:35", "arrival": "07:50", "price_aud": 443},
+    {"airline": "Link Airways", "flight_number": "FC 275", "departure": "11:30", "arrival": "13:20", "price_aud": 585}
+  ],
+  "BNE -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 336", "departure": "15:55", "arrival": "19:15", "price_aud": 402},
+    {"airline": "Jetstar", "flight_number": "JQ 753", "departure": "07:00", "arrival": "10:35", "price_aud": 445}
+  ]
+};
+
+const destAirports = [
+  {code: "BWT", name: "Burnie / Wynyard (1h drive)"},
+  {code: "DPO", name: "Devonport (2h drive)"},
+  {code: "LST", name: "Launceston (3h drive)"}
+];
+
+function filterCity(cityGroup, evt) {
+  if (evt) {
+    document.querySelectorAll('#cityFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    evt.target.classList.add('active');
+  }
+
+  const container = document.getElementById('flightResults');
+  container.innerHTML = '';
+  const origins = cityAirports[cityGroup] || [cityGroup];
+
+  destAirports.forEach(dest => {
+    let combinedFlights = [];
+
+    origins.forEach(orig => {
+      const key = `${orig} -> ${dest.code}`;
+      if (flightsData[key]) {
+        flightsData[key].forEach(f => {
+          combinedFlights.push({ ...f, originCode: orig });
+        });
+      }
+    });
+
+    let flightHTML = '';
+    if (combinedFlights.length === 0) {
+      flightHTML = '<div class="no-flights">No direct flight options found for this route.</div>';
+    } else {
+      combinedFlights.forEach(f => {
+        const logoUrl = airlineLogos[f.airline] || '';
+        const logoImg = logoUrl ? `<img src="${logoUrl}" class="airline-logo" alt="${f.airline}">` : `<strong>${f.airline}</strong>`;
+        
+        flightHTML += `
+          <div class="flight-item">
+            ${logoImg}
+            <div class="flight-details">
+              <div class="flight-num">${f.flight_number}</div>
+              <div class="flight-route">From: <strong>${f.originCode}</strong></div>
+              <div class="flight-time">${f.departure} → ${f.arrival}</div>
+            </div>
+            <div class="flight-price">$${f.price_aud}</div>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML += `
+      <div class="airport-card">
+        <div class="airport-title">To ${dest.name}</div>
+        ${flightHTML}
+      </div>
+    `;
+  });
+}
+
+filterCity('MEL', null);
+</script>
+</body>
+</html>
