@@ -54,7 +54,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 12px;
     }
 
@@ -102,15 +102,15 @@
   <p class="sub">Indicative schedules & fares for Conference travel (16 November 2026)</p>
 
   <div class="note-box">
-    💡 <strong>Note on Return Flights:</strong> Displayed flights reflect outbound arrival schedules. Most carriers operate symmetrical return flights on Friday, 20 November. Check Skyscanner or carrier sites for live return fares.
+    💡 <strong>Note on Return Flights:</strong> Displayed flights reflect outbound arrival schedules. Most carriers operate symmetrical return flights on Friday, 20 November.
   </div>
 
   <div class="filter-group" id="cityFilters">
-    <button class="filter-btn active" onclick="filterCity('MEL', event)">Melbourne (MEL / AVV)</button>
-    <button class="filter-btn" onclick="filterCity('SYD', event)">Sydney (SYD / WSI)</button>
-    <button class="filter-btn" onclick="filterCity('ADL', event)">Adelaide (ADL)</button>
-    <button class="filter-btn" onclick="filterCity('CBR', event)">Canberra (CBR)</button>
-    <button class="filter-btn" onclick="filterCity('BNE', event)">Brisbane (BNE)</button>
+    <button class="filter-btn active" onclick="filterCity('MEL', this)">Melbourne (MEL / AVV)</button>
+    <button class="filter-btn" onclick="filterCity('SYD', this)">Sydney (SYD / WSI)</button>
+    <button class="filter-btn" onclick="filterCity('ADL', this)">Adelaide (ADL)</button>
+    <button class="filter-btn" onclick="filterCity('CBR', this)">Canberra (CBR)</button>
+    <button class="filter-btn" onclick="filterCity('BNE', this)">Brisbane (BNE)</button>
   </div>
 
   <div class="grid" id="flightResults"></div>
@@ -123,7 +123,6 @@ const airlineLogos = {
   "Jetstar": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Jetstar_logo.svg/3840px-Jetstar_logo.svg.png"
 };
 
-// Mapping cities to airport codes
 const cityAirports = {
   "MEL": ["MEL", "AVV", "MEB"],
   "SYD": ["SYD", "WSI"],
@@ -132,8 +131,9 @@ const cityAirports = {
   "BNE": ["BNE"]
 };
 
-const flightsData =[cite: 1]{
+const flightsData = {
   "MEL -> BWT": [{"airline": "Qantas", "flight_number": "QF 2085", "departure": "07:15", "arrival": "08:25", "price_aud": 436}],
+  "MEL -> DPO": [],
   "MEL -> LST": [
     {"airline": "Virgin Australia", "flight_number": "VA 1380", "departure": "21:20", "arrival": "22:30", "price_aud": 183},
     {"airline": "Jetstar", "flight_number": "JQ 733", "departure": "07:10", "arrival": "08:20", "price_aud": 199},
@@ -183,10 +183,10 @@ const destAirports = [
   {code: "LST", name: "Launceston (3h drive)"}
 ];
 
-function filterCity(cityGroup, evt) {
-  if (evt) {
+function filterCity(cityGroup, btnElement) {
+  if (btnElement) {
     document.querySelectorAll('#cityFilters .filter-btn').forEach(b => b.classList.remove('active'));
-    evt.target.classList.add('active');
+    btnElement.classList.add('active');
   }
 
   const container = document.getElementById('flightResults');
