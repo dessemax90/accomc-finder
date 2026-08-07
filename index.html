@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACCOMC 2026 - Flight & Accommodation Finder</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent-green: #16a34a;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 24px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .section-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .filter-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .airport-card {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .airport-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .flight-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .airline-logo {
+      height: 22px;
+      max-width: 75px;
+      object-fit: contain;
+    }
+
+    .flight-details {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
+    .flight-num {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .flight-time {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .flight-price {
+      font-weight: bold;
+      color: var(--accent-green);
+      font-size: 14px;
+    }
+
+    .no-flights {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .hotel-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hotel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .hotel-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .hotel-price {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .price-highlight {
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+
+    .book-btn {
+      display: inline-block;
+      text-align: center;
+      background: var(--primary-light);
+      color: white;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .book-btn:hover {
+      background: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>✈️ ACCOMC 2026 Travel & Lodging Finder</h1>
+  <p class="subtitle">16–20 November 2026 | Smithton & Stanley, Tasmania</p>
+
+  <div class="section-box">
+    <h3 style="margin-top:0;">1. Select Departure City</h3>
+    <div class="filter-group" id="cityFilters">
+      <button class="filter-btn active" onclick="filterFlights('MEL', event)">Melbourne</button>
+      <button class="filter-btn" onclick="filterFlights('SYD', event)">Sydney</button>
+      <button class="filter-btn" onclick="filterFlights('ADL', event)">Adelaide</button>
+      <button class="filter-btn" onclick="filterFlights('CBR', event)">Canberra</button>
+      <button class="filter-btn" onclick="filterFlights('BNE', event)">Brisbane</button>
+    </div>
+
+    <div class="grid-container" id="flightResults"></div>
+  </div>
+
+  <div class="section-box">
+    <h3 style="margin-top:0;">2. Accommodation Directory</h3>
+    <div class="filter-group" id="hotelFilters">
+      <button class="filter-btn active" onclick="filterHotels('All', event)">All Locations</button>
+      <button class="filter-btn" onclick="filterHotels('Smithton', event)">Smithton (Venue)</button>
+      <button class="filter-btn" onclick="filterHotels('Stanley', event)">Stanley (20 min drive)</button>
+    </div>
+
+    <div class="grid-container" id="hotelResults"></div>
+  </div>
+</div>
+
+<script>
+const airlineLogos = {
+  "Qantas": "https://logos-world.net/wp-content/uploads/2023/01/Qantas-Logo.png",
+  "Virgin Australia": "https://upload.wikimedia.org/wikipedia/en/thumb/0/06/Virgin_Australia_Logo_2022.svg/3840px-Virgin_Australia_Logo_2022.svg.png",
+  "Jetstar": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Jetstar_logo.svg/3840px-Jetstar_logo.svg.png"
+};
+
+const flightsData = {
+  "MEL -> BWT": [{"airline": "Qantas", "flight_number": "QF 2085", "departure": "07:15", "arrival": "08:25", "price_aud": 436}],
+  "MEL -> DPO": [],
+  "MEL -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 1380", "departure": "21:20", "arrival": "22:30", "price_aud": 183},
+    {"airline": "Jetstar", "flight_number": "JQ 733", "departure": "07:10", "arrival": "08:20", "price_aud": 199},
+    {"airline": "Virgin Australia", "flight_number": "VA 1362", "departure": "09:40", "arrival": "10:50", "price_aud": 211}
+  ],
+  "SYD -> BWT": [
+    {"airline": "Qantas", "flight_number": "QF 441", "departure": "12:00", "arrival": "13:35", "price_aud": 797},
+    {"airline": "Qantas", "flight_number": "QF 1511", "departure": "13:00", "arrival": "14:35", "price_aud": 826},
+    {"airline": "Qantas", "flight_number": "QF 449", "departure": "14:00", "arrival": "15:35", "price_aud": 830}
+  ],
+  "SYD -> DPO": [
+    {"airline": "Qantas", "flight_number": "QF 401", "departure": "06:00", "arrival": "07:35", "price_aud": 648},
+    {"airline": "Qantas", "flight_number": "QF 461", "departure": "16:15", "arrival": "17:50", "price_aud": 648}
+  ],
+  "SYD -> LST": [
+    {"airline": "Jetstar", "flight_number": "JQ 749", "departure": "18:05", "arrival": "19:50", "price_aud": 181},
+    {"airline": "Virgin Australia", "flight_number": "VA 1094", "departure": "13:20", "arrival": "15:05", "price_aud": 225},
+    {"airline": "Qantas", "flight_number": "QF 1549", "departure": "13:15", "arrival": "15:05", "price_aud": 296}
+  ],
+  "ADL -> BWT": [
+    {"airline": "Qantas", "flight_number": "QF 674", "departure": "07:50", "arrival": "09:35", "price_aud": 806},
+    {"airline": "Qantas", "flight_number": "QF 686", "departure": "14:15", "arrival": "16:00", "price_aud": 806}
+  ],
+  "ADL -> DPO": [
+    {"airline": "Qantas", "flight_number": "QF 686", "departure": "14:15", "arrival": "16:00", "price_aud": 801},
+    {"airline": "Qantas", "flight_number": "QF 682", "departure": "12:00", "arrival": "13:45", "price_aud": 850}
+  ],
+  "ADL -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 236", "departure": "17:50", "arrival": "19:40", "price_aud": 358},
+    {"airline": "Virgin Australia", "flight_number": "VA 208", "departure": "07:15", "arrival": "09:05", "price_aud": 405},
+    {"airline": "Jetstar", "flight_number": "JQ 771", "departure": "06:15", "arrival": "08:05", "price_aud": 444}
+  ],
+  "CBR -> DPO": [{"airline": "Qantas", "flight_number": "QF 1551", "departure": "06:00", "arrival": "07:15", "price_aud": 666}],
+  "CBR -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 252", "departure": "06:35", "arrival": "07:50", "price_aud": 443},
+    {"airline": "Link Airways", "flight_number": "FC 275", "departure": "11:30", "arrival": "13:20", "price_aud": 585}
+  ],
+  "BNE -> LST": [
+    {"airline": "Virgin Australia", "flight_number": "VA 336", "departure": "15:55", "arrival": "19:15", "price_aud": 402},
+    {"airline": "Jetstar", "flight_number": "JQ 753", "departure": "07:00", "arrival": "10:35", "price_aud": 445}
+  ]
+};
+
+const hotelsData = [
+  {"name": "Tall Timbers Tasmania", "location": "Smithton", "rate": "$190", "total": "Special BOM Rate", "rating": 4.3, "link": "http://www.talltimbershotel.com.au/"},
+  {"name": "The Bridge Hotel", "location": "Smithton", "rate": "$92", "total": "$368", "rating": 4.2, "link": "http://www.bridgebistro.goodstone.com.au/"},
+  {"name": "Stanley Seaview Inn", "location": "Stanley", "rate": "$211", "total": "$844", "rating": 4.4, "link": "http://stanleyseaviewinn.com.au/"},
+  {"name": "Stanley Village", "location": "Stanley", "rate": "$239", "total": "$957", "rating": 4.7, "link": "http://www.stanleyvillage.com.au/"},
+  {"name": "BIG4 Tassie Getaway Parks", "location": "Stanley", "rate": "$171", "total": "$686", "rating": 4.6, "link": "http://www.tassiegetawayparks.com.au/stanley"},
+  {"name": "Hanlon Guest House", "location": "Stanley", "rate": "$160", "total": "$640", "rating": 4.6, "link": "http://www.hanlonguesthouse.com.au/"},
+  {"name": "Rosebank Cottage Collection", "location": "Smithton", "rate": "$185", "total": "$740", "rating": 4.9, "link": "https://rosebankcottages.com/"},
+  {"name": "Bilbos Cottage at Little Bird", "location": "Smithton", "rate": "$174", "total": "$696", "rating": 4.7, "link": "https://www.booking.com/hotel/au/bilbos-cottage-at-little-bird.en-gb.html"}
+];
+
+const destAirports = [
+  {code: "BWT", name: "Burnie / Wynyard (1h drive)"},
+  {code: "DPO", name: "Devonport (2h drive)"},
+  {code: "LST", name: "Launceston (3h drive)"}
+];
+
+function filterFlights(cityCode, evt) {
+  if(evt) {
+    document.querySelectorAll('#cityFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
+    evt.target.classList.add('active');
+  }
+
+  const container = document.getElementById('flightResults');
+  container.innerHTML = '';
+
+  destAirports.forEach(dest => {
+    const routeKey = `${cityCode} -> ${dest.code}`;
+    const flights = flightsData[routeKey] || [];
+
+    let flightHTML = '';
+    if (flights.length === 0) {
+      flightHTML = '<div class="no-flights">No direct flight options found.</div>';
+    } else {
+      flights.forEach(f => {
+        const logoUrl = airlineLogos[f.airline] || '';
+        const logoImg = logoUrl ? `<img src="${logoUrl}" class="airline-logo" alt="${f.airline}">` : `<strong>${f.airline}</strong>`;
+        
+        flightHTML += `
+          <div class="flight-item">
+            ${logoImg}
+            <div class="flight-details">
+              <div class="flight-num">${f.flight_number}</div>
+              <div class="flight-time">${f.departure} → ${f.arrival}</div>
+            </div>
+            <div class="flight-price">$${f.price_aud}</div>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML += `
+      <div class="airport-card">
+        <div class="airport-title">To ${dest.name}</div>
+        ${flightHTML}
+      </div>
+    `;
+  });
+}
+
+function filterHotels(locFilter, evt) {
+  if(evt) {
+    document.querySelectorAll('#hotelFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
+    evt.target.classList.add('active');
+  }
+
+  const container = document.getElementById('hotelResults');
+  container.innerHTML = '';
+
+  const filtered = locFilter === 'All' ? hotelsData : hotelsData.filter(h => h.location === locFilter);
+
+  filtered.forEach(h => {
+    const linkBtn = h.link ? `<a href="${h.link}" target="_blank" class="book-btn">View Accommodation →</a>` : '<span style="font-size:11px; color:#94a3b8;">Direct Booking Only</span>';
+    
+    container.innerHTML += `
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-header">
+            <div class="hotel-name">${h.name}</div>
+            <div class="badge">${h.location}</div>
+          </div>
+          <div class="hotel-price">
+            Rate: <span class="price-highlight">${h.rate} / night</span> (${h.total})<br>
+            Rating: ⭐ ${h.rating || 'N/A'}
+          </div>
+        </div>
+        ${linkBtn}
+      </div>
+    `;
+  });
+}
+
+// Initializing tool
+filterFlights('MEL', null);
+filterHotels('All', null);
+</script>
+
+</body>
+</html>
